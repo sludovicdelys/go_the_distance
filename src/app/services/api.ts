@@ -12,7 +12,7 @@ export interface Run {
     time: string;
     distance: number;
     comments?: string;
-    user: string; // This would typically be the IRI of the user
+    user: { username: string };
 }
 
 export const getRuns = async (): Promise<Run[]> => {
@@ -21,6 +21,13 @@ export const getRuns = async (): Promise<Run[]> => {
 };
 
 export const getRun = async (id: number): Promise<Run> => {
-    const response = await axios.get(`${API_URL}/runs/${id}`);
-    return response.data;
+    try {
+        console.log(`Fetching run with ID: ${id}`);
+        const response = await axios.get<Run>(`${API_URL}/runs/${id}`);
+        console.log('Run data:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching run data:', error);
+        throw error;
+    }
 };

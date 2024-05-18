@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { getRuns, Run } from './services/api';
 import Link from 'next/link';
-import RunActions from './components/RunActions';
+import RunActions from '../components/RunActions';
 
 const Home = () => {
     const [runs, setRuns] = useState<Run[]>([]);
@@ -61,7 +61,11 @@ const Home = () => {
                           {runs.map(run => (
                             <tr key={run.id}>
                               <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-semibold text-gray-900 sm:pl-6">{run.id}</td>
-                              <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{run.user.username}</td>
+                              <td className="whitespace-nowrap px-3 py-4 text-sm text-purple-900 hover:text-gray-900">
+                                <Link href={`/runs/${run.id}`}>
+                                    {run.user.username}
+                                </Link>
+                              </td>
                               <td className="whitespace-nowrap px-3 py-4 text-sm">{run.type}</td>
                               <td className="whitespace-nowrap px-3 py-4 text-sm">{run.average_speed}</td>
                               <td className="whitespace-nowrap px-3 py-4 text-sm">{run.running_pace}</td>
@@ -70,9 +74,7 @@ const Home = () => {
                               <td className="whitespace-nowrap px-3 py-4 text-sm">{run.time}</td>
                               <td className="whitespace-nowrap px-3 py-4 text-sm">{run.distance}</td>
                               <td className="whitespace-nowrap px-3 py-4 text-sm">{run.comments}</td>
-                              <td className="py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                               <RunActions runId={run.id} onEdit={handleEdit} onDelete={handleDelete} />
-                              </td>
                             </tr>
                           ))}
                         </tbody>
