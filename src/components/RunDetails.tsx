@@ -50,17 +50,53 @@ const RunDetails: React.FC = () => {
     }
 
     return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">Run Details</h1>
-            <p><strong>Type:</strong> {run.type}</p>
-            <p><strong>Distance:</strong> {run.distance} meters</p>
-            <p><strong>Average Speed:</strong> {run.average_speed} km/h</p>
-            <p><strong>Running Pace:</strong> {run.running_pace}</p>
-            <p><strong>Start Date:</strong> {run.start_date}</p>
-            <p><strong>Start Time:</strong> {run.start_time}</p>
-            <p><strong>Time:</strong> {run.time}</p>
-            <p><strong>Comments:</strong> {run.comments}</p>
-            <button onClick={() => router.back()}>Back</button>
+        <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
+            <div className="w-full max-w-2xl bg-white shadow-lg rounded-lg p-6">
+                <h1 className="text-4xl font-bold mb-6 text-center text-green-700">Run Details</h1>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-800">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Type</label>
+                        <p className="mt-1 text-lg bg-gray-100 p-2 rounded-md">{run.type}</p>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Distance</label>
+                        <p className="mt-1 text-lg bg-gray-100 p-2 rounded-md">{run.distance} meters</p>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Average Speed</label>
+                        <p className="mt-1 text-lg bg-gray-100 p-2 rounded-md">{run.average_speed} km/h</p>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Running Pace</label>
+                        <p className="mt-1 text-lg bg-gray-100 p-2 rounded-md">{run.running_pace}</p>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Start Date</label>
+                        <p className="mt-1 text-lg bg-gray-100 p-2 rounded-md">{run.start_date}</p>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Start Time</label>
+                        <p className="mt-1 text-lg bg-gray-100 p-2 rounded-md">{run.start_time}</p>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Time</label>
+                        <p className="mt-1 text-lg bg-gray-100 p-2 rounded-md">{run.time}</p>
+                    </div>
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700">Comments</label>
+                        <p className="mt-1 text-lg bg-gray-100 p-2 rounded-md">{run.comments}</p>
+                    </div>
+                </div>
+                <div className="flex justify-center mt-6">
+                <button 
+                    onClick={() => router.back()} 
+                    className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-700 transition"
+                    aria-label="Go back to the previous page"
+                >
+                    Back
+                </button>
+                </div>
+            </div>
         </div>
     );
 }
