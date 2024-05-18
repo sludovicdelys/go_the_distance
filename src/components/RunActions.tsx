@@ -18,12 +18,12 @@ const RunActions: FC<RunActionsProps> = ({ runId, onEdit, onDelete }) => {
   };
 
   return (
-    <td className="py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+    <td className="py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 relative">
       <div className="inline-block text-left">
         <button
           onClick={handleMenuToggle}
           type="button"
-          className="flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+          className="flex items-center text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
           aria-expanded={menuOpen}
           aria-haspopup="true"
         >
@@ -41,26 +41,26 @@ const RunActions: FC<RunActionsProps> = ({ runId, onEdit, onDelete }) => {
         {menuOpen && (
           <div
             onClick={handleMenuClose}
-            className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none"
+            className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none z-10"
             role="menu"
             aria-orientation="vertical"
             aria-labelledby="menu-button"
             tabIndex={-1}
           >
-            <div className="" role="none">
+            <div className="py-1" role="none">
               <button
                 onClick={() => onDelete(runId)}
-                className="text-gray-500 font-medium hover:text-gray-900 hover:bg-gray-50 block w-full text-left px-4 py-2 text-sm"
+                className="text-gray-700 font-medium hover:text-gray-900 hover:bg-gray-50 block w-full text-left px-4 py-2 text-sm"
                 role="menuitem"
                 tabIndex={-1}
               >
                 Delete
               </button>
             </div>
-            <div className="" role="none">
+            <div className="py-1" role="none">
               <button
                 onClick={() => onEdit(runId)}
-                className="text-gray-500 font-medium hover:text-gray-900 hover:bg-gray-50 block w-full text-left px-4 py-2 text-sm"
+                className="text-gray-700 font-medium hover:text-gray-900 hover:bg-gray-50 block w-full text-left px-4 py-2 text-sm"
                 role="menuitem"
                 tabIndex={-1}
               >
