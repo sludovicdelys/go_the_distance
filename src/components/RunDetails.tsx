@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { getRun, Run } from '../app/services/api';
+import { getRun, Run } from '../app/services/apiService';
 
 const RunDetails: React.FC = () => {
     const [run, setRun] = useState<Run | null>(null);
