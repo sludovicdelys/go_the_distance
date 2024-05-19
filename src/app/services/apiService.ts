@@ -1,13 +1,13 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
 // Create an axios instance with the base URL and authentication
 const axiosInstance = axios.create({
     baseURL: API_URL,
     auth: {
-        username: 'runner', // Use the actual username
-        password: 'secret'  // Use the actual password
+        username: process.env.NEXT_PUBLIC_API_USERNAME || '', // Use environment variable for username
+        password: process.env.NEXT_PUBLIC_API_PASSWORD || '',  // Use environment variable for password
     },
     headers: {
         'Content-Type': 'application/json', // Default content type for all requests
