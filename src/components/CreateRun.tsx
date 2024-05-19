@@ -19,6 +19,12 @@ const CreateRun: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    let valueisInt = false; 
+
+    if (name === 'distance' || name === 'average_speed') {
+      valueisInt = true
+    }
+
     if (name === 'username') {
       setFormData(prevData => ({
         ...prevData,
@@ -27,7 +33,8 @@ const CreateRun: React.FC = () => {
     } else {
       setFormData(prevData => ({
         ...prevData,
-        [name]: value,
+        [name]: !valueisInt ? value : parseInt(value),
+
       }));
     }
   };
@@ -52,7 +59,7 @@ const CreateRun: React.FC = () => {
       setErrors(newErrors);
       return;
     }
-
+    console.log(formData);
     try {
       await createRun(formData);
       // Redirect to the main page or a success page
