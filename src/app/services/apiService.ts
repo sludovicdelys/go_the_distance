@@ -19,11 +19,11 @@ const axiosInstance = axios.create({
 export interface Run {
     id: number;
     type: string;
-    average_speed: number;
-    running_pace: string;
-    start_date: string;
-    start_time: string;
-    time: string;
+    average_speed: number; // float
+    running_pace: string; // 'H:i:s'
+    start_date: string; // 'Y-m-d'
+    start_time: string; // 'H:i:s'
+    time: string; // 'H:i:s'
     distance: number;
     comments?: string;
     user: { username: string };

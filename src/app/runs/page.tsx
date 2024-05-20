@@ -77,12 +77,12 @@ const Home: React.FC = () => {
                         <a href={`/runs/${run.id}`}>{run.user.username}</a>
                       </td>
                       <td className="py-4 px-6 text-sm text-gray-500">{run.type}</td>
-                      <td className="py-4 px-6 text-sm text-center text-gray-500">{run.average_speed}</td>
-                      <td className="py-4 px-6 text-sm text-center text-gray-500">{run.running_pace}</td>
+                      <td className="py-4 px-6 text-sm text-center text-gray-500">{run.average_speed} km/h</td>
+                      <td className="py-4 px-6 text-sm text-center text-gray-500">{run.running_pace} min/km</td>
                       <td className="py-4 px-6 text-sm text-center text-gray-500">{run.start_date}</td>
                       <td className="py-4 px-6 text-sm text-center text-gray-500">{run.start_time}</td>
                       <td className="py-4 px-6 text-sm text-center text-gray-500">{run.time}</td>
-                      <td className="py-4 px-6 text-sm text-center text-gray-500">{run.distance}</td>
+                      <td className="py-4 px-6 text-sm text-center text-gray-500">{run.distance} km</td>
                       <td className="py-4 px-6 text-sm text-center text-gray-500">{run.comments}</td>
                       <RunActions runId={run.id} onEdit={handleEditRun} onDelete={handleDeleteRun} />
                     </tr>

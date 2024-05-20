@@ -21,7 +21,8 @@ const CreateRun: React.FC = () => {
     const { name, value } = e.target;
     let valueisInt = false; 
 
-    if (name === 'distance' || name === 'average_speed') {
+    if (name === 'distance' || name === 'average_speed' || name === 'running_pace' || name === 'time' || name === 'start_time')
+    {
       valueisInt = true
     }
 
@@ -42,14 +43,28 @@ const CreateRun: React.FC = () => {
   const validate = () => {
     const newErrors: { [key: string]: string | null } = {};
     if (!formData.type) newErrors.type = 'Run Type is required';
-    if (!formData.average_speed) newErrors.average_speed = 'Average Speed is required';
-    if (!formData.running_pace) newErrors.running_pace = 'Running Pace is required';
     if (!formData.start_date) newErrors.start_date = 'Start Date is required';
     if (!formData.start_time) newErrors.start_time = 'Start Time is required';
     if (!formData.time) newErrors.time = 'Time is required';
     if (!formData.distance) newErrors.distance = 'Distance is required';
     if (!formData.user?.username) newErrors.username = 'Username is required';
     return newErrors;
+  };
+
+  const calculateAverageSpeed = (distance: number, time: string) => {
+    const timeParts = time.split(':').map(Number);
+    const timeInHours = timeParts[0] + timeParts[1] / 60 + timeParts[2] / 3600;
+    return distance / timeInHours;
+  };
+
+  const calculateRunningPace = (distance: number, time: string) => {
+    const timeParts = time.split(':').map(Number);
+    const timeInHours = timeParts[0] + timeParts[1] / 60 + timeParts[2] / 3600;
+    const runningPaceInMinutes = timeInHours / distance * 60;
+    const runningPaceHours = Math.floor(runningPaceInMinutes / 60);
+    const runningPaceMinutes = Math.floor(runningPaceInMinutes % 60);
+    const runningPaceSeconds = Math.round((runningPaceInMinutes - Math.floor(runningPaceInMinutes)) * 60);
+    return `${runningPaceHours.toString().padStart(2, '0')}:${runningPaceMinutes.toString().padStart(2, '0')}:${runningPaceSeconds.toString().padStart(2, '0')}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -59,10 +74,27 @@ const CreateRun: React.FC = () => {
       setErrors(newErrors);
       return;
     }
-    console.log(formData);
+
+    if (!formData.time || !formData.distance) {
+      setError('Time and Distance are required');
+      return;
+    }
+
+    const average_speed = calculateAverageSpeed(formData.distance, formData.time);
+    const running_pace = calculateRunningPace(formData.distance, formData.time);
+
+    const finalData = {
+      ...formData,
+      average_speed: parseFloat(average_speed.toFixed(2)),
+      running_pace,
+      start_date: formData.start_date ? new Date(formData.start_date).toISOString().split('T')[0] : '',
+      start_time: formData.start_time,
+      time: formData.time,
+    };
+
+    console.log(finalData);
     try {
-      await createRun(formData);
-      // Redirect to the main page or a success page
+      await createRun(finalData);
       window.location.href = '/';
     } catch (error) {
       setError('Error creating run');
@@ -107,36 +139,6 @@ const CreateRun: React.FC = () => {
                 {errors.type && <p id="type-error" className="text-red-500 text-sm mt-1">{errors.type}</p>}
               </div>
               <div>
-                <label htmlFor="average_speed" className="block text-gray-700 text-sm font-bold mb-2">Average Speed:</label>
-                <input
-                  type="number"
-                  id="average_speed"
-                  name="average_speed"
-                  value={formData.average_speed || ''}
-                  onChange={handleChange}
-                  placeholder="Average Speed"
-                  className={`w-full px-4 py-2 border rounded-md ${errors.average_speed ? 'border-red-500' : ''}`}
-                  aria-invalid={!!errors.average_speed}
-                  aria-describedby={errors.average_speed ? 'average_speed-error' : undefined}
-                />
-                {errors.average_speed && <p id="average_speed-error" className="text-red-500 text-sm mt-1">{errors.average_speed}</p>}
-              </div>
-              <div>
-                <label htmlFor="running_pace" className="block text-gray-700 text-sm font-bold mb-2">Running Pace:</label>
-                <input
-                  type="time"
-                  id="running_pace"
-                  name="running_pace"
-                  value={formData.running_pace || ''}
-                  onChange={handleChange}
-                  placeholder="Average Speed"
-                  className={`w-full px-4 py-2 border rounded-md ${errors.running_pace ? 'border-red-500' : ''}`}
-                  aria-invalid={!!errors.running_pace}
-                  aria-describedby={errors.running_pace ? 'running_pace-error' : undefined}
-                />
-                {errors.running_pace && <p id="running_pace-error" className="text-red-500 text-sm mt-1">{errors.running_pace}</p>}
-              </div>
-              <div>
                 <label htmlFor="start_date" className="block text-gray-700 text-sm font-bold mb-2">Start Date:</label>
                 <input
                   type="date"
@@ -156,7 +158,7 @@ const CreateRun: React.FC = () => {
                   type="time"
                   id="start_time"
                   name="start_time"
-                  value={formData.start_time || ''}
+                  value={formData.time || ''}
                   onChange={handleChange}
                   className={`w-full px-4 py-2 border rounded-md ${errors.start_time ? 'border-red-500' : ''}`}
                   aria-invalid={!!errors.start_time}
