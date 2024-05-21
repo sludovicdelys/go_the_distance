@@ -5,37 +5,48 @@ import { createRun, Run } from '../app/services/apiService';
 const CreateRun: React.FC = () => {
   const [formData, setFormData] = useState<Partial<Run>>({
     type: '',
-    average_speed: 0,
-    running_pace: '',
     start_date: '',
-    start_time: '',
-    time: '',
+    start_time: '00:00:00',
+    time: '00:00:00',
     distance: 0,
     comments: '',
     user: { username: '' },
   });
+
   const [errors, setErrors] = useState<{ [key: string]: string | null }>({});
   const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    let valueisInt = false; 
-
-    if (name === 'distance' || name === 'average_speed' || name === 'running_pace' || name === 'time' || name === 'start_time')
-    {
-      valueisInt = true
-    }
 
     if (name === 'username') {
       setFormData(prevData => ({
         ...prevData,
         user: { ...prevData.user, username: value }
       }));
+    } else if (name.endsWith('_hour') || name.endsWith('_minute')) {
+      // Handle hour and minute inputs
+      let nameParts = name.split('_');
+      let timePart = nameParts.pop() as string; // 'hour' or 'minute'
+      let timeField = nameParts.join('_'); // 'start_time' or 'time'
+      let timeValue = (formData[timeField as keyof typeof formData] || '00:00:00') as string;
+      let timeParts = timeValue.split(':'); // Split the time value into hours and minutes
+
+      if (timePart === 'hour') {
+        timeParts[0] = value.padStart(2, '0');
+      } else if (timePart === 'minute') {
+        timeParts[1] = value.padStart(2, '0');
+      }
+
+      // Update the time field with the new hours and minutes
+      setFormData(prevData => ({
+        ...prevData,
+        [timeField]: `${timeParts[0]}:${timeParts[1]}:00`,
+      }));
     } else {
       setFormData(prevData => ({
         ...prevData,
-        [name]: !valueisInt ? value : parseInt(value),
-
+        [name]: (name === 'distance') ? parseInt(value) : value,
       }));
     }
   };
@@ -44,61 +55,54 @@ const CreateRun: React.FC = () => {
     const newErrors: { [key: string]: string | null } = {};
     if (!formData.type) newErrors.type = 'Run Type is required';
     if (!formData.start_date) newErrors.start_date = 'Start Date is required';
-    if (!formData.start_time) newErrors.start_time = 'Start Time is required';
-    if (!formData.time) newErrors.time = 'Time is required';
+    if (formData.start_time === '00:00') newErrors.start_time = 'Start Time is required';
+    if (formData.time === '00:00') newErrors.time = 'Time is required';
     if (!formData.distance) newErrors.distance = 'Distance is required';
     if (!formData.user?.username) newErrors.username = 'Username is required';
     return newErrors;
   };
 
-  const calculateAverageSpeed = (distance: number, time: string) => {
-    const timeParts = time.split(':').map(Number);
-    const timeInHours = timeParts[0] + timeParts[1] / 60 + timeParts[2] / 3600;
-    return distance / timeInHours;
-  };
-
-  const calculateRunningPace = (distance: number, time: string) => {
-    const timeParts = time.split(':').map(Number);
-    const timeInHours = timeParts[0] + timeParts[1] / 60 + timeParts[2] / 3600;
-    const runningPaceInMinutes = timeInHours / distance * 60;
-    const runningPaceHours = Math.floor(runningPaceInMinutes / 60);
-    const runningPaceMinutes = Math.floor(runningPaceInMinutes % 60);
-    const runningPaceSeconds = Math.round((runningPaceInMinutes - Math.floor(runningPaceInMinutes)) * 60);
-    return `${runningPaceHours.toString().padStart(2, '0')}:${runningPaceMinutes.toString().padStart(2, '0')}:${runningPaceSeconds.toString().padStart(2, '0')}`;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log('Submit button clicked'); 
+    console.log('Before handleSubmit:', formData);
     e.preventDefault();
+    console.log('Has required data'); // Add this line
+
     const newErrors = validate();
+    console.log('Validation errors:', newErrors); 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-
+    console.log('Passed validation');
+  
     if (!formData.time || !formData.distance) {
       setError('Time and Distance are required');
       return;
     }
 
-    const average_speed = calculateAverageSpeed(formData.distance, formData.time);
-    const running_pace = calculateRunningPace(formData.distance, formData.time);
+    console.log('Has required data');
 
+  
     const finalData = {
       ...formData,
-      average_speed: parseFloat(average_speed.toFixed(2)),
-      running_pace,
       start_date: formData.start_date ? new Date(formData.start_date).toISOString().split('T')[0] : '',
-      start_time: formData.start_time,
-      time: formData.time,
+      start_time: formData.start_time ? `${formData.start_time}` : '',
+      time: formData.time ? `${formData.time}` : '',
     };
 
-    console.log(finalData);
+    console.log('Final data:', finalData);
+  
     try {
       await createRun(finalData);
-      window.location.href = '/';
-    } catch (error) {
-      setError('Error creating run');
+      // Use your routing library's navigation function here
+    } catch (error : any) {
+      console.error(error); // Log the error to the console
+      setError(error.message || 'Error creating run');
     }
+
+    // Log formData after submit
+    console.log('After handleSubmit:', formData);
   };
 
   return (
@@ -152,34 +156,64 @@ const CreateRun: React.FC = () => {
                 />
                 {errors.start_date && <p id="start_date-error" className="text-red-500 text-sm mt-1">{errors.start_date}</p>}
               </div>
-              <div>
-                <label htmlFor="start_time" className="block text-gray-700 text-sm font-bold mb-2">Start Time:</label>
-                <input
-                  type="time"
-                  id="start_time"
-                  name="start_time"
-                  value={formData.time || ''}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-2 border rounded-md ${errors.start_time ? 'border-red-500' : ''}`}
-                  aria-invalid={!!errors.start_time}
-                  aria-describedby={errors.start_time ? 'start_time-error' : undefined}
-                />
-                {errors.start_time && <p id="start_time-error" className="text-red-500 text-sm mt-1">{errors.start_time}</p>}
-              </div>
-              <div>
-                <label htmlFor="time" className="block text-gray-700 text-sm font-bold mb-2">Time:</label>
-                <input
-                  type="time"
-                  id="time"
-                  name="time"
-                  value={formData.time || ''}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-2 border rounded-md ${errors.time ? 'border-red-500' : ''}`}
-                  aria-invalid={!!errors.time}
-                  aria-describedby={errors.time ? 'time-error' : undefined}
-                />
-                {errors.time && <p id="time-error" className="text-red-500 text-sm mt-1">{errors.time}</p>}
-              </div>
+              <fieldset className="mb-4 p-4 border rounded-lg bg-gray-50">
+                <legend className="text-lg font-semibold text-gray-700 mb-2">Start Time</legend>
+                <div className="flex items-center space-x-2 mb-2" >
+                  <label htmlFor="start_time_hour" className="text-gray-700">Hour:</label>
+                  <input
+                    type="number"
+                    id="start_time_hour"
+                    name="start_time_hour"
+                    min="0"
+                    max="23"
+                    onChange={handleChange}
+                    aria-label="Start time hour"
+                    className="w-16 px-2 py-1 border rounded-md"
+                  />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <label htmlFor="start_time_minute" className="text-gray-700">Minute:</label>
+                  <input
+                    type="number"
+                    id="start_time_minute"
+                    name="start_time_minute"
+                    min="0"
+                    max="59"
+                    onChange={handleChange}
+                    aria-label="Start time minute"
+                    className="w-16 px-2 py-1 border rounded-md"
+                  />
+                </div>
+              </fieldset>
+              <fieldset className="mb-4 p-4 border rounded-lg bg-gray-50">
+                <legend className="text-lg font-semibold text-gray-700 mb-2">Time</legend>
+                <div className="flex items-center space-x-2 mb-2">
+                  <label htmlFor="time_hour" className="text-gray-700">Hour:</label>
+                  <input
+                    type="number"
+                    id="time_hour"
+                    name="time_hour"
+                    min="0"
+                    max="23"
+                    onChange={handleChange}
+                    aria-label="time hour"
+                    className="w-16 px-2 py-1 border rounded-md"
+                  />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <label htmlFor="time_minute" className="text-gray-700">Minute:</label>
+                  <input
+                    type="number"
+                    id="time_minute"
+                    name="time_minute"
+                    min="0"
+                    max="59"
+                    onChange={handleChange}
+                    aria-label="time minute"
+                    className="w-16 px-2 py-1 border rounded-md"
+                  />
+                </div>
+              </fieldset>
               <div>
                 <label htmlFor="distance" className="block text-gray-700 text-sm font-bold mb-2">Distance:</label>
                 <input

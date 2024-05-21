@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from 'react';
 import { login } from '@/app/services/apiService'; // Adjust the import path as needed
 
